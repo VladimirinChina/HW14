@@ -1,6 +1,7 @@
 # E-commerce Core Engine
 
 A Python-based backend core for an e-commerce system, managing product catalogs and categories with automated tracking.
+Implemented Product and Category models with encapsulation, product management, and JSON data loading.
 
 ## Features
 - **OOP Architecture**: Robust `Product` and `Category` classes.

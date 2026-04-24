@@ -1,43 +1,18 @@
 import json
-from typing import List
-
-from src.models import Category, Product
+from typing import Any, List, cast
 
 
-def load_data_from_json(path: str) -> List[Category]:
+def load_json_file(path: str) -> List[Any]:
     """
-    Загружает категории и товары из JSON-файла.
+    Загружает данные из JSON-файла.
+
+    Функция выполняет только чтение и парсинг JSON без какой-либо
+    бизнес-логики или преобразования данных.
 
     :param path: Путь к JSON-файлу
-    :return: Список объектов Category
+    :return: Список данных из JSON
+    :raises FileNotFoundError: если файл не найден
+    :raises json.JSONDecodeError: если файл содержит некорректный JSON
     """
     with open(path, "r", encoding="utf-8") as file:
-        data = json.load(file)
-
-    categories: List[Category] = []
-
-    for category_data in data:
-        products = []
-
-        for product_data in category_data.get("products", []):
-            try:
-                product = Product(
-                    name=product_data["name"],
-                    description=product_data["description"],
-                    price=float(product_data["price"]),
-                    quantity=int(product_data["quantity"]),
-                )
-                products.append(product)
-            except KeyError:
-                # если вдруг кривой JSON — просто пропускаем
-                continue
-
-        category = Category(
-            name=category_data.get("name", "Без названия"),
-            description=category_data.get("description", ""),
-            products=products,
-        )
-
-        categories.append(category)
-
-    return categories
+        return cast(List[Any], json.load(file))

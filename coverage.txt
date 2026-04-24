@@ -3,9 +3,10 @@ platform darwin -- Python 3.13.11, pytest-9.0.3, pluggy-1.6.0
 rootdir: /Users/vladimir/PycharmProjects/HW14
 configfile: pyproject.toml
 plugins: cov-7.1.0
-collected 7 items
+collected 13 items
 
-tests/test_models.py .......                                             [100%]
+tests/test_models.py .........                                           [ 69%]
+tests/test_utils.py ....                                                 [100%]
 
 ================================ tests coverage ================================
 ______________ coverage: platform darwin, python 3.13.11-final-0 _______________
@@ -13,8 +14,8 @@ ______________ coverage: platform darwin, python 3.13.11-final-0 _______________
 Name              Stmts   Miss  Cover
 -------------------------------------
 src/__init__.py       0      0   100%
-src/models.py        21      1    95%
-src/utils.py         18      2    89%
+src/models.py        53      5    91%
+src/utils.py          5      0   100%
 -------------------------------------
-TOTAL                39      3    92%
-============================== 7 passed in 0.15s ===============================
+TOTAL                58      5    91%
+============================== 13 passed in 0.18s ==============================
