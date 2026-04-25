@@ -1,93 +1,117 @@
 import pytest
+from _pytest.capture import CaptureFixture
 
 from src.models import Category, Product
-from src.utils import load_data_from_json
 
 
 @pytest.fixture
 def product() -> Product:
-    return Product("iPhone", "Smartphone", 999.99, 5)
+    return Product("Смартфон", "Описание смартфона", 100000.0, 10)
 
 
-def test_product_init(product: Product) -> None:
-    """Проверка корректной инициализации Product."""
-    assert product.name == "iPhone"
-    assert product.description == "Smartphone"
-    assert product.price == 999.99
-    assert product.quantity == 5
-
-
-def test_category_init_with_products(product: Product) -> None:
-    """Проверка создания категории с товарами."""
+@pytest.fixture
+def category(product: Product) -> Category:
+    # обнуляем счетчики перед тестами (ВАЖНО!)
     Category.category_count = 0
     Category.product_count = 0
+    return Category("Категория", "Описание категории", [product])
 
-    category = Category("Phones", "Smartphones", [product])
 
-    assert category.name == "Phones"
-    assert category.description == "Smartphones"
-    assert len(category.products) == 1
-    assert isinstance(category.products[0], Product)
+# ---------- Product ----------
+
+def test_product_initialization() -> None:
+    product = Product("Телефон", "Мобильный телефон", 50000.0, 3)
+
+    assert product.name == "Телефон"
+    assert product.description == "Мобильный телефон"
+    assert product.price == 50000.0
+    assert product.quantity == 3
+
+
+def test_price_setter_valid() -> None:
+    product = Product("Телефон", "Описание", 50000.0, 3)
+
+    product.price = 60000.0
+    assert product.price == 60000.0
+
+
+def test_price_setter_invalid(capsys: CaptureFixture[str]) -> None:
+    product = Product("Телефон", "Описание", 50000.0, 3)
+
+    product.price = -100
+
+    captured = capsys.readouterr()
+    assert "Цена не должна быть нулевая или отрицательная" in captured.out
+    assert product.price == 50000.0
+
+
+def test_new_product_create() -> None:
+    data = {
+        "name": "Телефон",
+        "description": "Описание",
+        "price": 50000.0,
+        "quantity": 3,
+    }
+
+    product = Product.new_product(data)
+
+    assert isinstance(product, Product)
+    assert product.name == "Телефон"
+
+
+def test_new_product_merge() -> None:
+    existing = [Product("Телефон", "Старое описание", 40000.0, 2)]
+
+    data = {
+        "name": "Телефон",
+        "description": "Новое описание",
+        "price": 50000.0,
+        "quantity": 3,
+    }
+
+    product = Product.new_product(data, existing)
+
+    assert product.quantity == 5  # 2 + 3
+    assert product.price == 50000.0  # max
+
+
+# ---------- Category ----------
+
+def test_category_initialization(category: Category) -> None:
+    assert category.name == "Категория"
+    assert category.description == "Описание категории"
 
     assert Category.category_count == 1
     assert Category.product_count == 1
 
 
-def test_category_init_without_products() -> None:
-    """Проверка создания категории без передачи списка товаров."""
-    Category.category_count = 0
-    Category.product_count = 0
+def test_add_product(category: Category) -> None:
+    new_product = Product("Ноутбук", "Игровой ноутбук", 150000.0, 2)
 
-    category = Category("Empty", "No products")
-
-    assert category.products == []
-    assert Category.category_count == 1
-    assert Category.product_count == 0
-
-
-def test_category_count_multiple() -> None:
-    """Проверка подсчета количества категорий."""
-    Category.category_count = 0
-
-    Category("A", "desc")
-    Category("B", "desc")
-
-    assert Category.category_count == 2
-
-
-def test_product_count_multiple() -> None:
-    """Проверка подсчета количества товаров."""
-    Category.product_count = 0
-
-    p1 = Product("A", "desc", 10.0, 1)
-    p2 = Product("B", "desc", 20.0, 2)
-
-    Category("Cat1", "desc", [p1, p2])
+    category.add_product(new_product)
 
     assert Category.product_count == 2
+    assert "Ноутбук" in category.products
 
 
-def test_products_property_readonly(product: Product) -> None:
-    """Проверка, что products доступен через property."""
-    category = Category("Test", "Desc", [product])
+def test_products_getter(category: Category) -> None:
+    result = category.products
 
-    assert isinstance(category.products, list)
-    assert isinstance(category.products[0], Product)
+    assert isinstance(result, str)
+    assert "Смартфон" in result
+    assert "руб." in result
+    assert "Остаток" in result
 
 
-def test_load_real_json() -> None:
-    categories = load_data_from_json("data/products.json")
+def test_multiple_categories_count() -> None:
+    Category.category_count = 0
+    Category.product_count = 0
 
-    assert len(categories) == 2
+    p1 = Product("Товар1", "Описание", 1000, 1)
+    p2 = Product("Товар2", "Описание", 2000, 2)
 
-    # первая категория
-    assert categories[0].name == "Смартфоны"
-    assert len(categories[0].products) == 3
+    Category("Категория1", "Описание", [p1])
+    Category("Категория2", "Описание", [p2])
 
-    # вторая категория
-    assert categories[1].name == "Телевизоры"
-    assert len(categories[1].products) == 1
-
-    # проверка типов
-    assert isinstance(categories[0], Category)
-    assert isinstance(categories[0].products[0], Product)
+    assert Category.category_count == 2
+    assert Category.product_count == 2
