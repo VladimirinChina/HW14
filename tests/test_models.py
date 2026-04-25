@@ -6,7 +6,7 @@ from src.models import Category, Product
 
 @pytest.fixture
 def product() -> Product:
-    return Product("Смартфон", "Описание смартфона", 100000.0, 10)
+    return Product("Смартфон", "Описание смартфона", 100000.0, 5)
 
 
 @pytest.fixture
@@ -115,3 +115,25 @@ def test_multiple_categories_count() -> None:
 
     assert Category.category_count == 2
     assert Category.product_count == 2
+
+
+def test_product_str(product: Product) -> None:
+    assert str(product) == "Смартфон, 100000.0 руб. Остаток: 5 шт."
+
+
+def test_category_str(product: Product) -> None:
+    category = Category("Техника", "Описание", [product])
+    assert str(category) == "Техника, количество продуктов: 5 шт."
+
+
+def test_product_add(product: Product) -> None:
+    product2 = Product("Ноутбук", "Игровой", 50000.0, 2)
+
+    result = product + product2
+
+    assert result == (100000.0 * 5 + 50000.0 * 2)
+
+
+def test_product_add_invalid(product: Product) -> None:
+    with pytest.raises(TypeError):
+        product + 5  # type: ignore
