@@ -20,6 +20,27 @@ class Product:
         self.__price = price
         self.quantity = quantity
 
+    def __str__(self) -> str:
+        """
+        Строковое представление товара.
+
+        :return: строка вида:
+        "Название продукта, X руб. Остаток: X шт."
+        """
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other: "Product") -> float:
+        """
+        Складывает два товара (их полную стоимость на складе).
+
+        :param other: второй товар
+        :return: сумма (price * quantity) для двух товаров
+        """
+        if not isinstance(other, Product):
+            raise TypeError("Можно складывать только объекты Product")
+
+        return self.__price * self.quantity + other.price * other.quantity
+
     @property
     def price(self) -> float:
         """
@@ -97,6 +118,16 @@ class Category:
         Category.category_count += 1
         # Считаем количество уникальных позиций товаров в этой категории
         Category.product_count += len(self.__products)
+
+    def __str__(self) -> str:
+        """
+        Строковое представление категории.
+
+        :return: строка вида:
+        "Название категории, количество продуктов: X шт."
+        """
+        total_quantity = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
 
     def add_product(self, product: Product) -> None:
         """
