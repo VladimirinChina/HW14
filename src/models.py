@@ -144,6 +144,13 @@ class Category:
         self.__products.append(product)
         Category.product_count += 1
 
+    def get_products_list(self) -> List[Product]:
+        """
+        Возвращает список продуктов категории.
+        (внутренний метод для служебного использования)
+        """
+        return self.__products
+
     @property
     def products(self) -> str:
         # Используем список для сборки строк (более эффективно, чем +=)
