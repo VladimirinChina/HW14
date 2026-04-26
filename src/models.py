@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Any
 
 
 class BaseProduct(ABC):
@@ -28,12 +28,22 @@ class BaseProduct(ABC):
         pass
 
 
+class BaseEntity(ABC):
+    """
+    Абстрактный класс для сущностей, работающих с продуктами.
+    """
+    @abstractmethod
+    def total_cost(self) -> float:
+        """Возвращает общую стоимость."""
+        pass
+
+
 class PrintMixin:
     """
     Миксин для вывода информации о создании объекта.
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         print(repr(self))
 
@@ -164,7 +174,7 @@ class LawnGrass(Product):
         self.color = color
 
 
-class Category:
+class Category(BaseEntity):
     """
     Класс, представляющий категорию товаров.
     """
@@ -215,6 +225,10 @@ class Category:
         self.__products.append(product)
         Category.product_count += 1
 
+    def total_cost(self) -> float:
+        """Общая стоимость всех товаров в категории."""
+        return sum(product.price * product.quantity for product in self.__products)
+
     def get_products_list(self) -> List[Product]:
         """
         Возвращает список продуктов категории.
@@ -230,3 +244,22 @@ class Category:
             for product in self.__products
         ]
         return "\n".join(product_list) + "\n"
+
+
+class Order(BaseEntity):
+    """
+    Класс заказа (один товар).
+    """
+
+    def __init__(self, product: Product, quantity: int) -> None:
+        self.product = product
+        self.quantity = quantity
+
+    def total_cost(self) -> float:
+        """
+        Общая стоимость заказа.
+        """
+        return self.product.price * self.quantity
+
+    def __str__(self) -> str:
+        return f"{self.product.name}, {self.quantity} шт. = {self.total_cost()} руб."
