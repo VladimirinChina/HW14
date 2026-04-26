@@ -36,7 +36,7 @@ class Product:
         :param other: второй товар
         :return: сумма (price * quantity) для двух товаров
         """
-        if not isinstance(other, Product):
+        if type(self) is not type(other):
             raise TypeError("Можно складывать только объекты Product")
 
         return self.__price * self.quantity + other.price * other.quantity
@@ -74,23 +74,62 @@ class Product:
         """
         Создает продукт или обновляет существующий.
         """
-        name = data["name"]
-        description = data["description"]
-        price = data["price"]
-        quantity = data["quantity"]
-
-        # Доп. задание: логика объединения дубликатов
+        #  Поиск дубликатов
         if existing_products:
             for product in existing_products:
-                if product.name == name:
+                if product.name == data["name"]:
                     # Складываем количество
-                    product.quantity += quantity
+                    product.quantity += data["quantity"]
                     # Выбираем максимальную цену
-                    if price > product.price:
-                        product.price = price
+                    if data["price"] > product.price:
+                        product.price = data["price"]
                     return product
 
-        return cls(name, description, price, quantity)
+        return cls(**data)
+
+
+class Smartphone(Product):
+    """Класс для смартфонов."""
+    def __init__(self, name: str, description: str, price: float, quantity: int,
+                 efficiency: float, model: str, memory: int, color: str):
+        """
+        Инициализация объекта товара.
+        :param name: Название товара
+        :param description: Описание товара
+        :param price: Цена товара
+        :param quantity: Количество товара в наличии
+        :param efficiency: производительность
+        :param model: модель
+        :param memory: объем внутренней памяти
+        :param color: цвет
+        """
+        # Вызываем конструктор родителя для общих полей
+        super().__init__(name, description, price, quantity)
+        # Добавляем специфические поля
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+
+class LawnGrass(Product):
+    """Класс для газонной травы."""
+    def __init__(self, name: str, description: str, price: float, quantity: int,
+                 country: str, germination_period: str, color: str):
+        """
+        Инициализация объекта товара
+        :param name: название товара
+        :param description: описание товара
+        :param price: цена товара
+        :param quantity: количество товара в наличии
+        :param country: страна-производитель
+        :param germination_period: срок прорастания
+        :param color: цвет
+        """
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
 
 
 class Category:
