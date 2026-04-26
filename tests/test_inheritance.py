@@ -1,6 +1,6 @@
 import pytest
 
-from src.models import LawnGrass, Product, Smartphone
+from src.models import BaseProduct, LawnGrass, Product, Smartphone
 
 # ---------- BaseProduct ----------
 
@@ -13,7 +13,13 @@ def test_product_is_instance_of_base() -> None:
     assert product.quantity == 5
 
 
+def test_product_inherits_base() -> None:
+    product = Product("Товар", "Описание", 100.0, 5)
+
+    assert isinstance(product, BaseProduct)
+
 # ---------- Mixin (печать) ----------
+
 
 def test_mixin_print(capsys: pytest.CaptureFixture[str]) -> None:
     Product("Товар", "Описание", 100.0, 5)
@@ -22,6 +28,16 @@ def test_mixin_print(capsys: pytest.CaptureFixture[str]) -> None:
 
     assert "name='Товар'" in captured.out
     assert "quantity=5" in captured.out
+
+
+def test_repr_format() -> None:
+    product = Product("Товар", "Описание", 100.0, 5)
+
+    repr_str = repr(product)
+
+    assert "Product(" in repr_str
+    assert "name='Товар'" in repr_str
+    assert "quantity=5" in repr_str
 
 
 # ---------- Smartphone ----------
