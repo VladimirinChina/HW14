@@ -1,15 +1,15 @@
+from abc import ABC, abstractmethod
 from typing import List, Optional
 
 
-class Product:
+class BaseProduct(ABC):
     """
-    Класс, представляющий товар.
+    Абстрактный базовый класс для всех продуктов.
     """
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         """
         Инициализация объекта товара.
-
         :param name: Название товара
         :param description: Описание товара
         :param price: Цена товара
@@ -17,8 +17,37 @@ class Product:
         """
         self.name = name
         self.description = description
-        self.__price = price
+        self._price = price
         self.quantity = quantity
+
+    @abstractmethod
+    def __str__(self) -> str:
+        """
+        Абстрактный метод строкового представления.
+        """
+        pass
+
+
+class PrintMixin:
+    """
+    Миксин для вывода информации о создании объекта.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        print(self.__repr__())
+        super().__init__(*args, **kwargs)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}{self.__dict__}"
+
+
+class Product(PrintMixin, BaseProduct):
+    """
+    Класс, представляющий товар.
+    """
+
+    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
+            super().__init__(name, description, price, quantity)
 
     def __str__(self) -> str:
         """
@@ -39,7 +68,7 @@ class Product:
         if type(self) is not type(other):
             raise TypeError("Можно складывать только объекты Product")
 
-        return self.__price * self.quantity + other.price * other.quantity
+        return self.price * self.quantity + other.price * other.quantity
 
     @property
     def price(self) -> float:
@@ -48,7 +77,7 @@ class Product:
 
         :return: текущая цена товара
         """
-        return self.__price
+        return self._price
 
     @price.setter
     def price(self, value: float) -> None:
@@ -61,13 +90,13 @@ class Product:
             print("Цена не должна быть нулевая или отрицательная")
             return
 
-        if value < self.__price:
+        if value < self._price:
             user_answer = input(f"Цена товара {self.name} понижается. Вы уверены? (y/n): ")
             if user_answer.lower() == "y":
                 print("Операция выполнена.")
                 return
 
-        self.__price = value
+        self._price = value
 
     @classmethod
     def new_product(cls, data: dict, existing_products: Optional[List["Product"]] = None) -> "Product":
