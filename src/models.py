@@ -34,11 +34,14 @@ class PrintMixin:
     """
 
     def __init__(self, *args, **kwargs) -> None:
-        print(self.__repr__())
         super().__init__(*args, **kwargs)
+        print(repr(self))
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}{self.__dict__}"
+        attrs = ", ".join(
+            f"{key}={value!r}" for key, value in self.__dict__.items()
+        )
+        return f"{self.__class__.__name__}({attrs})"
 
 
 class Product(PrintMixin, BaseProduct):
@@ -47,7 +50,7 @@ class Product(PrintMixin, BaseProduct):
     """
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
-            super().__init__(name, description, price, quantity)
+        super().__init__(name, description, price, quantity)
 
     def __str__(self) -> str:
         """
