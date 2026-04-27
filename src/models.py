@@ -1,15 +1,15 @@
-from typing import List, Optional
+from abc import ABC, abstractmethod
+from typing import List, Optional, Any
 
 
-class Product:
+class BaseProduct(ABC):
     """
-    Класс, представляющий товар.
+    Абстрактный базовый класс для всех продуктов.
     """
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         """
         Инициализация объекта товара.
-
         :param name: Название товара
         :param description: Описание товара
         :param price: Цена товара
@@ -17,8 +17,50 @@ class Product:
         """
         self.name = name
         self.description = description
-        self.__price = price
+        self._price = price
         self.quantity = quantity
+
+    @abstractmethod
+    def __str__(self) -> str:
+        """
+        Абстрактный метод строкового представления.
+        """
+        pass
+
+
+class BaseEntity(ABC):
+    """
+    Абстрактный класс для сущностей, работающих с продуктами.
+    """
+    @abstractmethod
+    def total_cost(self) -> float:
+        """Возвращает общую стоимость."""
+        pass
+
+
+class PrintMixin:
+    """
+    Миксин для вывода информации о создании объекта.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        print(repr(self))
+
+    def __repr__(self) -> str:
+        attrs = ", ".join(
+            f"{key}={value!r}" for key, value in self.__dict__.items()
+        )
+        return f"{self.__class__.__name__}({attrs})"
+
+
+class Product(PrintMixin, BaseProduct):
+    """
+    Класс, представляющий товар.
+    """
+
+    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
+        super().__init__(name, description, price, quantity)
 
     def __str__(self) -> str:
         """
@@ -39,7 +81,7 @@ class Product:
         if type(self) is not type(other):
             raise TypeError("Можно складывать только объекты Product")
 
-        return self.__price * self.quantity + other.price * other.quantity
+        return self.price * self.quantity + other.price * other.quantity
 
     @property
     def price(self) -> float:
@@ -48,7 +90,7 @@ class Product:
 
         :return: текущая цена товара
         """
-        return self.__price
+        return self._price
 
     @price.setter
     def price(self, value: float) -> None:
@@ -61,13 +103,13 @@ class Product:
             print("Цена не должна быть нулевая или отрицательная")
             return
 
-        if value < self.__price:
+        if value < self._price:
             user_answer = input(f"Цена товара {self.name} понижается. Вы уверены? (y/n): ")
             if user_answer.lower() == "y":
                 print("Операция выполнена.")
                 return
 
-        self.__price = value
+        self._price = value
 
     @classmethod
     def new_product(cls, data: dict, existing_products: Optional[List["Product"]] = None) -> "Product":
@@ -132,7 +174,7 @@ class LawnGrass(Product):
         self.color = color
 
 
-class Category:
+class Category(BaseEntity):
     """
     Класс, представляющий категорию товаров.
     """
@@ -183,6 +225,10 @@ class Category:
         self.__products.append(product)
         Category.product_count += 1
 
+    def total_cost(self) -> float:
+        """Общая стоимость всех товаров в категории."""
+        return sum(product.price * product.quantity for product in self.__products)
+
     def get_products_list(self) -> List[Product]:
         """
         Возвращает список продуктов категории.
@@ -198,3 +244,22 @@ class Category:
             for product in self.__products
         ]
         return "\n".join(product_list) + "\n"
+
+
+class Order(BaseEntity):
+    """
+    Класс заказа (один товар).
+    """
+
+    def __init__(self, product: Product, quantity: int) -> None:
+        self.product = product
+        self.quantity = quantity
+
+    def total_cost(self) -> float:
+        """
+        Общая стоимость заказа.
+        """
+        return self.product.price * self.quantity
+
+    def __str__(self) -> str:
+        return f"{self.product.name}, {self.quantity} шт. = {self.total_cost()} руб."

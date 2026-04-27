@@ -100,3 +100,12 @@ Tests were added and updated using pytest:
 - Validation of protected category addition logic
 
 All previously implemented tests pass successfully, ensuring backward compatibility.
+
+## Latest Updates
+- Abstract Logic: Implemented BaseProduct abstract base class to enforce core product structure using abc.
+
+- Logging Mixin: Integrated PrintMixin to automatically log object creation details via __repr__.
+
+- Order System: Added Order class with a shared abstract root for both Order and Category.
+
+- Testing: Achieved >75% test coverage for new functionality using pytest.
