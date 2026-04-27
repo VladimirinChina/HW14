@@ -75,6 +75,16 @@ def test_new_product_merge() -> None:
     assert product.price == 50000.0  # max
 
 
+def test_product_zero_quantity() -> None:
+    with pytest.raises(ValueError):
+        Product("Товар", "Описание", 100.0, 0)
+
+
+def test_product_negative_quantity() -> None:
+    with pytest.raises(ValueError):
+        Product("Товар", "Описание", 100.0, -5)
+
+
 # ---------- Category ----------
 
 def test_category_initialization(category: Category) -> None:
@@ -137,3 +147,41 @@ def test_product_add(product: Product) -> None:
 def test_product_add_invalid(product: Product) -> None:
     with pytest.raises(TypeError):
         product + 5  # type: ignore
+
+
+def test_average_price() -> None:
+    p1 = Product("Товар1", "Описание", 100.0, 1)
+    p2 = Product("Товар2", "Описание", 200.0, 1)
+
+    category = Category("Категория", "Описание", [p1, p2])
+
+    assert category.average_price() == 150.0
+
+
+def test_average_price_empty() -> None:
+    category = Category("Пустая", "Описание", [])
+
+    assert category.average_price() == 0.0
+
+
+def test_add_product_zero_quantity(category: Category, capsys: CaptureFixture[str]) -> None:
+    bad_product = Product("Брак", "Описание", 100.0, 1)
+    bad_product.quantity = 0  # эмулируем проблему
+
+    category.add_product(bad_product)
+
+    captured = capsys.readouterr()
+
+    assert "Нельзя добавить товар с нулевым количеством" in captured.out
+    assert "Обработка добавления товара завершена" in captured.out
+
+
+def test_add_product_success(category: Category, capsys: CaptureFixture[str]) -> None:
+    product = Product("Ноутбук", "Описание", 1000.0, 2)
+
+    category.add_product(product)
+
+    captured = capsys.readouterr()
+
+    assert "Товар успешно добавлен" in captured.out
+    assert "Обработка добавления товара завершена" in captured.out

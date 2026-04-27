@@ -1,5 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional, Any
+from typing import Any, List, Optional
+
+
+class ZeroQuantityError(Exception):
+    """
+    Исключение для товара с нулевым количеством.
+    """
+    def __init__(self, message: str = "Нельзя добавить товар с нулевым количеством"):
+        super().__init__(message)
 
 
 class BaseProduct(ABC):
@@ -8,6 +16,8 @@ class BaseProduct(ABC):
     """
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
+        if quantity <= 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
         """
         Инициализация объекта товара.
         :param name: Название товара
@@ -210,6 +220,9 @@ class Category(BaseEntity):
         total_quantity = sum(product.quantity for product in self.__products)
         return f"{self.name}, количество продуктов: {total_quantity} шт."
 
+    def middle_price(self) -> float:
+        return self.average_price()
+
     def add_product(self, product: Product) -> None:
         """
         Добавляет новый продукт в категорию.
@@ -222,8 +235,21 @@ class Category(BaseEntity):
         if not isinstance(product, Product):
             raise TypeError("Можно добавлять только объекты Product")
 
-        self.__products.append(product)
-        Category.product_count += 1
+        try:
+
+            if product.quantity <= 0:
+                raise ZeroQuantityError()
+
+        except ZeroQuantityError as e:
+            print(e)
+
+        else:
+            self.__products.append(product)
+            Category.product_count += 1
+            print("Товар успешно добавлен")
+
+        finally:
+            print("Обработка добавления товара завершена")
 
     def total_cost(self) -> float:
         """Общая стоимость всех товаров в категории."""
@@ -235,6 +261,18 @@ class Category(BaseEntity):
         (внутренний метод для служебного использования)
         """
         return self.__products
+
+    def average_price(self) -> float:
+        """
+        Возвращает среднюю цену товаров в категории.
+
+        Если товаров нет, возвращает 0.
+        """
+        try:
+            total_price = sum(product.price for product in self.__products)
+            return total_price / len(self.__products)
+        except ZeroDivisionError:
+            return 0.0
 
     @property
     def products(self) -> str:
@@ -263,3 +301,22 @@ class Order(BaseEntity):
 
     def __str__(self) -> str:
         return f"{self.product.name}, {self.quantity} шт. = {self.total_cost()} руб."
+
+    def add_product(self, product: Product, quantity: int) -> None:
+        """
+        Добавляет товар в заказ с проверками.
+        """
+        try:
+            if quantity <= 0:
+                raise ZeroQuantityError()
+
+        except ZeroQuantityError as e:
+            print(e)
+
+        else:
+            self.product = product
+            self.quantity = quantity
+            print("Товар успешно добавлен в заказ")
+
+        finally:
+            print("Обработка добавления товара завершена")

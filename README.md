@@ -109,3 +109,10 @@ All previously implemented tests pass successfully, ensuring backward compatibil
 - Order System: Added Order class with a shared abstract root for both Order and Category.
 
 - Testing: Achieved >75% test coverage for new functionality using pytest.
+
+## New Features
+
+- Added `average_price()` method to calculate the average price of products in a category
+- Implemented custom `ZeroQuantityError` for handling invalid product additions
+- Added safe product addition logic using `try/except/else/finally`
+- Improved error handling for edge cases (e.g., empty categories, invalid product quantity)

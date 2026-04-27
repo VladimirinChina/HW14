@@ -3,12 +3,12 @@ platform darwin -- Python 3.13.11, pytest-9.0.3, pluggy-1.6.0
 rootdir: /Users/vladimir/PycharmProjects/HW14
 configfile: pyproject.toml
 plugins: cov-7.1.0
-collected 31 items
+collected 37 items
 
-tests/test_classes.py .....                                              [ 16%]
-tests/test_inheritance.py .......                                        [ 38%]
-tests/test_iterators.py ..                                               [ 45%]
-tests/test_models.py .............                                       [ 87%]
+tests/test_classes.py .....                                              [ 13%]
+tests/test_inheritance.py .......                                        [ 32%]
+tests/test_iterators.py ..                                               [ 37%]
+tests/test_models.py ...................                                 [ 89%]
 tests/test_utils.py ....                                                 [100%]
 
 ================================ tests coverage ================================
@@ -18,8 +18,8 @@ Name               Stmts   Miss  Cover
 --------------------------------------
 src/__init__.py        0      0   100%
 src/iterators.py       8      0   100%
-src/models.py        101     11    89%
+src/models.py        132     21    84%
 src/utils.py           5      0   100%
 --------------------------------------
-TOTAL                114     11    90%
-============================== 31 passed in 0.51s ==============================
+TOTAL                145     21    86%
+============================== 37 passed in 0.34s ==============================
