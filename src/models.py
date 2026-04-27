@@ -220,6 +220,9 @@ class Category(BaseEntity):
         total_quantity = sum(product.quantity for product in self.__products)
         return f"{self.name}, количество продуктов: {total_quantity} шт."
 
+    def middle_price(self) -> float:
+        return self.average_price()
+
     def add_product(self, product: Product) -> None:
         """
         Добавляет новый продукт в категорию.
@@ -229,9 +232,10 @@ class Category(BaseEntity):
         :param product: Объект продукта, который необходимо добавить в категорию
         :return: None
         """
+        if not isinstance(product, Product):
+            raise TypeError("Можно добавлять только объекты Product")
+
         try:
-            if not isinstance(product, Product):
-                raise TypeError("Можно добавлять только объекты Product")
 
             if product.quantity <= 0:
                 raise ZeroQuantityError()
