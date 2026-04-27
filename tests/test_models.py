@@ -75,6 +75,16 @@ def test_new_product_merge() -> None:
     assert product.price == 50000.0  # max
 
 
+def test_product_zero_quantity() -> None:
+    with pytest.raises(ValueError):
+        Product("Товар", "Описание", 100.0, 0)
+
+
+def test_product_negative_quantity() -> None:
+    with pytest.raises(ValueError):
+        Product("Товар", "Описание", 100.0, -5)
+
+
 # ---------- Category ----------
 
 def test_category_initialization(category: Category) -> None:
